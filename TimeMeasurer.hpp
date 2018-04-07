@@ -3,15 +3,15 @@
 
 //this lib uses C++14 STL lib's
 
-#if __cplusplus < 201402L
-#error This library needs at least C++14
+#ifdef _WIN32
+#include <windows.h>
 #endif
 
 #include <chrono>
 #include <future>
 #include <thread>
 
-enum Ratio {nano_seconds, micro_seconds, milli_seconds, centi_seconds, deci_seconds, seconds};
+enum Ratio {nanoseconds, microseconds, milliseconds, seconds};
 
 template <Ratio ratio>
 class TimeMeasurer
@@ -21,47 +21,61 @@ class TimeMeasurer
 public:
     TimeMeasurer() = delete;
 
-    //this constexpr function's use is to set up
-    //ratio template for "std::ratio <>"
-
-    static constexpr unsigned long long _ratio_to_ll(const Ratio r)
-    {
-        switch(r) {
-        case nano_seconds:  return 1000000000ll;
-        case micro_seconds: return 1000000ll;
-        case milli_seconds: return 1000ll;
-        case centi_seconds: return 100ll;
-        case deci_seconds:  return 10ll;
-        case seconds:       return 1ll;
-        }
-    }
-
     //function's template counts execution time of Callable object, passing "args".
     //returns value depended on ratio template argument.
 
     template <class Callable, class ...Args>
-    static double measure_exec_time(Callable f, Args... args)
+    static long double measure_exec_time(Callable f, Args... args)
     {
         auto start = std::chrono::high_resolution_clock::now();
         f(args...);
         auto stop = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration <double, std::ratio <1, _ratio_to_ll(ratio)>>(stop - start).count();
+        return std::chrono::duration <long double, std::ratio <1, _ratio_to_ll(ratio)>>(stop - start).count();
     }
 
     //function's template starts new thread, which will execute Callable object, passing "args".
     //returns "std::future <double>" object which will store time value depended on ratio template argument.
 
     template <class Callable, class ...Args>
-    static std::future <double> async_measure_exec_time(Callable f, Args... args)
+    static std::future <long double> async_measure_exec_time(Callable f, Args... args)
     {
         return std::async(std::launch::async, [f, args...]
         {
             auto start = std::chrono::high_resolution_clock::now();
             f(args...);
             auto stop = std::chrono::high_resolution_clock::now();
-            return std::chrono::duration <double, std::ratio <1, _ratio_to_ll(ratio)>>(stop - start).count();
+            return std::chrono::duration <long double, std::ratio <1, _ratio_to_ll(ratio)>>(stop - start).count();
         });
     }
+
+private:
+    //this constexpr function's use is to set up
+    //ratio template for "std::ratio <>"
+
+    static constexpr unsigned long long _ratio_to_ll(const Ratio r)
+    {
+        switch(r) {
+        case nanoseconds:  return 1000000000ll;
+        case microseconds: return 1000000ll;
+        case milliseconds: return 1000ll;
+        case seconds:      return 1ll;
+        }
+    }
 };
+
+#ifdef _WIN32
+namespace TickMeasurer
+{
+    template <class Callable, class ...Args>
+    static uint64_t measure_exec_ticks(Callable f, Args ...args)
+    {
+        LARGE_INTEGER start, stop;
+        QueryPerformanceCounter(&start);
+        f(args...);
+        QueryPerformanceCounter(&stop);
+        return stop.QuadPart - start.QuadPart;
+    }
+}
+#endif
 
 #endif // MEASUREEXECTIME_H
