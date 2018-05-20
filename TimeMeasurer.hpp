@@ -48,7 +48,6 @@ public:
     //function's template starts new thread, which will execute Callable object, passing "args".
     //returns "std::future <double>" object which will store time value depended on ratio template argument.
 
-	/*
     template <class Callable, class ...Args>
     static std::future <long double> async_measure_exec_time(Callable f, Args... args)
     {
@@ -59,7 +58,7 @@ public:
             auto stop = std::chrono::high_resolution_clock::now();
             return std::chrono::duration <long double, std::ratio <1, _ratio_to_ll(ratio)>>(stop - start).count();
         });
-    }*/
+    }
 };
 
 #ifdef _WIN32
