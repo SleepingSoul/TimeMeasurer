@@ -86,7 +86,8 @@ public:
 	{}
 	TimeGuard(const TimeGuard &) = delete;
 	TimeGuard(TimeGuard &&) = delete;
-	operator =(const TimeGuard &) = delete;
+	TimeGuard& operator =(const TimeGuard &) = delete;
+	TimeGuard& operator =(TimeGuard&&) = delete;
 	
 	~TimeGuard()
 	{
@@ -110,7 +111,8 @@ public:
 	}
 	TickGuard(const TickGuard &) = delete;
 	TickGuard(TickGuard &&) = delete;
-	operator =(const TickGuard &) = delete;
+	TickGuard& operator =(const TickGuard &) = delete;
+	TickGuard& operator =(TickGuard&&) = delete;
 	
 	~TickGuard()
 	{
