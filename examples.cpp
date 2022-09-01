@@ -35,6 +35,13 @@ int main()
 
     std::cout << "Hello world\n";
 
+    int i = 0;
+    while (i != 10)
+    {
+        i ++;
+        std::cout << i;
+    }
+
 #ifdef _WIN32
     //Now we will measure ticks for small function (TimeMeasurer will probably return 0)
     std::cout << measure::executeAndMeasureTicks(small_operation);
