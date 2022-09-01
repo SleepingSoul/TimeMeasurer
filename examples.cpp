@@ -33,6 +33,8 @@ int main()
     std::cout << measure::executeAndMeasureTime <measure::Ratio::milliseconds>(do_something, std::ref(a), std::ref(b)) << '\n';
     //after: a = 256. b = 0
 
+    std::cout << "Hello world\n";
+
 #ifdef _WIN32
     //Now we will measure ticks for small function (TimeMeasurer will probably return 0)
     std::cout << measure::executeAndMeasureTicks(small_operation);
